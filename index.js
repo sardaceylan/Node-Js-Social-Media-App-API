@@ -1,30 +1,32 @@
 const express = require("express");
+const app = express();
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const dotenv = require("dotenv");
-const userRouter = require("./routers/users");
-const authRouter = require("./routers/auth");
-const postRouter = require("./routers/posts");
-const app = express();
+const userRoute = require("./routers/users");
+const authRoute = require("./routers/auth");
+const postRoute = require("./routers/posts");
 
 dotenv.config();
 
-mongoose
-  .connect(process.env.MONGO_URL, { useNewUrlParser: true })
-  .then(() => {
+mongoose.connect(
+  process.env.MONGO_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => {
     console.log("Connected to MongoDB");
-  })
-  .catch((err) => console.log("Could not connect to MongoDB"));
+  }
+);
 
+//middleware
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
-app.use("/api/user", userRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/posts", postRouter);
+app.use("/api/auth", authRoute);
+app.use("/api/users", userRoute);
+app.use("/api/posts", postRoute);
 
 app.listen(8800, () => {
-  console.log("app is running");
+  console.log("Backend server is running!");
 });
